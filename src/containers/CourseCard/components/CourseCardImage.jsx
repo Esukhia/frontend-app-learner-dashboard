@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useIntl } from '@edx/frontend-platform/i18n';
+import { getConfig } from '@edx/frontend-platform';
 
 import { Badge } from '@openedx/paragon';
 
@@ -27,6 +28,10 @@ export const CourseCardImage = ({ cardId, orientation }) => {
         className="pgn__card-image-cap show"
         src={bannerImgSrc}
         alt={formatMessage(messages.bannerAlt)}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = getConfig().LOGO_URL;
+        }}
       />
       {
         isVerified && (
