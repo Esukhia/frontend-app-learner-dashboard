@@ -1,3 +1,7 @@
+$card-image-horizontal-max-width-custom: 360px !default; // previously was 240px
+$card-image-horizontal-min-height-custom: 200px !default; // card height with single line of course name
+$card-image-horizontal-max-height-custom: 227px !default; // card height with two lines of course name
+
 .course-card {
   .card {
     .pgn__card-wrapper-image-cap.vertical {
@@ -6,6 +10,19 @@
     }
     .pgn__card-image-cap {
       border-bottom-left-radius: 0 !important;
+    }
+    .d-flex > .pgn__card-wrapper-image-cap.horizontal {
+      max-width: $card-image-horizontal-max-width-custom;
+      min-width: $card-image-horizontal-max-width-custom;
+      max-height: $card-image-horizontal-max-height-custom;
+      min-height: $card-image-horizontal-min-height-custom;
+      overflow: hidden;
+
+      .pgn__card-image-cap {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: fill !important;
+      }
     }
     .overflow-visible {
       overflow: visible;
