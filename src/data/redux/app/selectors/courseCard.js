@@ -150,6 +150,19 @@ export const courseCard = StrictDict({
       length: relatedPrograms.length,
     }),
   ),
+  completionSummary: mkCardSelector(
+    cardSimpleSelectors.completionSummary,
+    (completionSummary) => {
+      if (!completionSummary) {
+        return { completeCount: 0, incompleteCount: 0, lockedCount: 0 };
+      }
+      return {
+        completeCount: completionSummary.completeCount || 0,
+        incompleteCount: completionSummary.incompleteCount || 0,
+        lockedCount: completionSummary.lockedCount || 0,
+      };
+    },
+  ),
 });
 
 export default courseCard;
