@@ -21,6 +21,16 @@ const messages = defineMessages({
     description: 'Course card select-session button text',
     defaultMessage: 'Select Session',
   },
+  courseCompletion: {
+    id: 'learner-dash.courseCard.progressBar.courseCompletion',
+    description: 'Course progress bar text',
+    defaultMessage: 'Course • {percent}% Complete',
+  },
+  notStarted: {
+    id: 'learner-dash.courseCard.progressBar.notStarted',
+    description: 'course is not started text instead of progress bar',
+    defaultMessage: 'Not started',
+  },
 });
 
 export default messages;
