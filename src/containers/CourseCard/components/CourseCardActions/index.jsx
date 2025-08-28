@@ -10,6 +10,7 @@ import SelectSessionButton from './SelectSessionButton';
 import BeginCourseButton from './BeginCourseButton';
 import ResumeButton from './ResumeButton';
 import ViewCourseButton from './ViewCourseButton';
+import ProgressBar from './ProgressBar';
 
 export const CourseCardActions = ({ cardId }) => {
   const { isEntitlement, isFulfilled } = reduxHooks.useCardEntitlementData(cardId);
@@ -21,6 +22,7 @@ export const CourseCardActions = ({ cardId }) => {
   return (
     <ActionRow data-test-id="CourseCardActions">
       <CourseCardActionSlot cardId={cardId} />
+      <ProgressBar cardId={cardId} hasStarted={hasStarted} />
       {isEntitlement && (isFulfilled
         ? <ViewCourseButton cardId={cardId} />
         : <SelectSessionButton cardId={cardId} />

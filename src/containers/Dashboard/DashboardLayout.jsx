@@ -11,7 +11,7 @@ export const columnConfig = {
   courseList: {
     withSidebar: {
       lg: { span: 12, offset: 0 },
-      xl: { span: 8, offset: 0 },
+      xl: { span: 12, offset: 0 },
     },
     noSidebar: {
       lg: { span: 12, offset: 0 },
@@ -20,7 +20,7 @@ export const columnConfig = {
   },
   sidebar: {
     lg: { span: 12, offset: 0 },
-    xl: { span: 4, offset: 0 },
+    xl: { span: 12, offset: 0 },
   },
 };
 
@@ -35,13 +35,14 @@ export const DashboardLayout = ({ children }) => {
     : columnConfig.courseList.noSidebar;
 
   return (
-    <Container fluid size="xl">
+    <Container fluid size="lg">
       <Row>
+        <Col {...columnConfig.sidebar} className="sidebar-column">
+          <WidgetSidebarSlot />
+          {!isCollapsed && (<h2 className="course-list-title m-0 micro">&nbsp;</h2>)}
+        </Col>
         <Col {...courseListColumnProps} className="course-list-column">
           {children}
-        </Col>
-        <Col {...columnConfig.sidebar} className={['sidebar-column', !isCollapsed && 'not-collapsed']}>
-          <WidgetSidebarSlot />
         </Col>
       </Row>
     </Container>

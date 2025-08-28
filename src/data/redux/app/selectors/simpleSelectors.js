@@ -29,6 +29,7 @@ export const cardSimpleSelectors = StrictDict({
   entitlement: ({ entitlement }) => entitlement,
   gradeData: ({ gradeData }) => gradeData,
   relatedPrograms: ({ programs: { relatedPrograms } }) => relatedPrograms,
+  completionSummary: ({ completionSummary }) => completionSummary,
 });
 
 export const mkCardSelector = (simpleSelector, selector) => (state, cardId) => (
