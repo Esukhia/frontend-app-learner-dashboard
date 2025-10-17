@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import fetchCompletionSummaries from 'data/redux/app/fetchCompletionSummaries';
 
 import { useIntl } from '@edx/frontend-platform/i18n';
 
@@ -21,9 +23,18 @@ import './index.scss';
  * @returns List of courses as CourseCards or empty state
 */
 export const CoursesPanel = () => {
+  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const hasCourses = reduxHooks.useHasCourses();
   const courseListData = useCourseListData();
+  const courses = useSelector(state => state.app.currentList?.courseIds || []);
+
+  useEffect(() => {
+    if (courses.length) {
+      dispatch(fetchCompletionSummaries(courses));
+    }
+  }, [dispatch, courses]);
+
   return (
     <div className="course-list-container">
       <div className="course-list-heading-container">
