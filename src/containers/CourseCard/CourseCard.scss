@@ -66,6 +66,10 @@ $card-image-horizontal-max-height-custom: 227px !default; // card height with tw
     }
   }
 
+  .pgn__action-row {
+    justify-content: space-between;
+  }
+
   .course-card-banners {
     > .alert {
       border-radius: 0;
@@ -94,7 +98,6 @@ $card-image-horizontal-max-height-custom: 227px !default; // card height with tw
 // progress loader
 .dots-loader__container {
   display: inline-flex;
-  min-width: 100px;
   align-items: center;
   justify-content: center;
   height: 24px;
