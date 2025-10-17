@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import fetchCompletionSummaries from 'data/redux/app/fetchCompletionSummaries';
+import { getCompletionData } from 'data/services/lms/api';
+import { actions } from 'data/redux/app/reducer';
 
 import { useIntl } from '@edx/frontend-platform/i18n';
 
@@ -30,9 +31,24 @@ export const CoursesPanel = () => {
   const courses = useSelector(state => state.app.currentList?.courseIds || []);
 
   useEffect(() => {
-    if (courses.length) {
-      dispatch(fetchCompletionSummaries(courses));
-    }
+    const { updateCourseCard, setCompletionPending } = actions;
+    const load = async () => {
+      if (!courses.length) {
+        return;
+      }
+      dispatch(setCompletionPending(true));
+      try {
+        const { data } = await getCompletionData({ courseIds: courses });
+        Object.entries(data).forEach(([courseKey, summary]) => {
+          dispatch(updateCourseCard({ courseId: courseKey, data: { completionSummary: summary } }));
+        });
+      } catch (err) {
+        // logging is handled elsewhere; swallow to avoid breaking UI
+      } finally {
+        dispatch(setCompletionPending(false));
+      }
+    };
+    load();
   }, [dispatch, courses]);
 
   return (

@@ -4,9 +4,11 @@ import { AppContext } from '@edx/frontend-platform/react';
 
 import { RequestKeys } from 'data/constants/requests';
 import { post } from 'data/services/lms/utils';
-import api from 'data/services/lms/api';
+import api, { getCompletionData } from 'data/services/lms/api';
 
 import * as reduxHooks from 'data/redux/hooks';
+import { actions } from 'data/redux/app/reducer';
+import { logError } from '@edx/frontend-platform/logging';
 import * as module from './api';
 
 const { useMakeNetworkRequest } = reduxHooks;
@@ -102,4 +104,35 @@ export const useCreateCreditRequest = (cardId) => {
   const { authenticatedUser: { username } } = React.useContext(AppContext);
   const { courseId } = reduxHooks.useCardCourseRunData(cardId);
   return () => api.createCreditRequest({ providerId, courseId, username });
+};
+
+export const fetchCompletionSummaries = async (courseIds, dispatch, getState) => {
+  const ids = courseIds || [];
+  if (ids.length === 0) {
+    return;
+  }
+
+  const courseData = getState().app.courseData || {};
+  const idsToFetch = ids.filter(
+    id => !Object.values(courseData).some(c => c.courseKey === id && c.completionSummary),
+  );
+  if (!idsToFetch.length) {
+    return;
+  }
+
+  const { updateCourseCard, setCompletionPending } = actions;
+
+  dispatch(setCompletionPending(true));
+
+  try {
+    const { data } = await getCompletionData({ courseIds: idsToFetch });
+
+    Object.entries(data).forEach(([courseKey, summary]) => {
+      dispatch(updateCourseCard({ courseId: courseKey, data: { completionSummary: summary } }));
+    });
+  } catch (error) {
+    logError(error);
+  } finally {
+    dispatch(setCompletionPending(false));
+  }
 };
