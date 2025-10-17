@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCompletionData } from 'data/services/lms/api';
+import { actions } from 'data/redux/app/reducer';
 
 import { useIntl } from '@edx/frontend-platform/i18n';
 
@@ -21,9 +24,33 @@ import './index.scss';
  * @returns List of courses as CourseCards or empty state
 */
 export const CoursesPanel = () => {
+  const dispatch = useDispatch();
   const { formatMessage } = useIntl();
   const hasCourses = reduxHooks.useHasCourses();
   const courseListData = useCourseListData();
+  const courses = useSelector(state => state.app.currentList?.courseIds || []);
+
+  useEffect(() => {
+    const { updateCourseCard, setCompletionPending } = actions;
+    const load = async () => {
+      if (!courses.length) {
+        return;
+      }
+      dispatch(setCompletionPending(true));
+      try {
+        const { data } = await getCompletionData({ courseIds: courses });
+        Object.entries(data).forEach(([courseKey, summary]) => {
+          dispatch(updateCourseCard({ courseId: courseKey, data: { completionSummary: summary } }));
+        });
+      } catch (err) {
+        // logging is handled elsewhere; swallow to avoid breaking UI
+      } finally {
+        dispatch(setCompletionPending(false));
+      }
+    };
+    load();
+  }, [dispatch, courses]);
+
   return (
     <div className="course-list-container">
       <div className="course-list-heading-container">

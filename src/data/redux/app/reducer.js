@@ -5,6 +5,7 @@ import { StrictDict } from 'utils';
 const initialState = {
   pageNumber: 1,
   courseData: {},
+  currentList: { courseIds: [] },
   entitlement: [],
   emailConfirmation: {},
   enterpriseDashboard: {},
@@ -12,6 +13,7 @@ const initialState = {
   suggestedCourses: [],
   selectSessionModal: {},
   filters: [],
+  completionPending: false,
 };
 
 export const cardId = (val) => `card-${val}`;
@@ -25,19 +27,30 @@ const app = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    loadCourses: (state, { payload: { courses } }) => ({
-      ...state,
-      courseData: courses.reduce(
-        (obj, curr, index) => {
-          const out = { ...curr, cardId: cardId(index) };
-          if (out.enrollment.lastEnrolled === null) {
-            out.enrollment.lastEnrolled = today;
-          }
-          return { ...obj, [cardId(index)]: out };
-        },
-        {},
-      ),
-    }),
+    loadCourses: (state, { payload: { courses } }) => {
+      const courseData = courses.reduce((obj, curr, index) => {
+        // get courseId from courseRun
+        const courseId = curr.courseRun?.courseId;
+        if (!courseId) {
+          return obj;
+        }
+
+        const out = { ...curr, cardId: cardId(index) };
+        out.courseKey = courseId; // 🔑 store for later lookups
+
+        if (out.enrollment && out.enrollment.lastEnrolled === null) {
+          out.enrollment.lastEnrolled = today;
+        }
+
+        return { ...obj, [cardId(index)]: out };
+      }, {});
+
+      return {
+        ...state,
+        courseData,
+        currentList: { courseIds: courses.map(c => c.courseRun?.courseId).filter(Boolean) },
+      };
+    },
     loadGlobalData: (state, { payload }) => ({
       ...state,
       emailConfirmation: payload.emailConfirmation,
@@ -67,6 +80,33 @@ const app = createSlice({
       ...state,
       filters: [],
     }),
+    setCompletionPending: (state, { payload }) => ({
+      ...state,
+      completionPending: payload,
+    }),
+    updateCourseCard: (state, { payload }) => {
+      const { courseId, data } = payload;
+      // find the matching cardId
+      const cardKey = Object.keys(state.courseData).find(
+        key => state.courseData[key].courseKey === courseId,
+      );
+      if (!cardKey) {
+        return state;
+      }
+
+      const newCourseData = {
+        ...state.courseData,
+        [cardKey]: {
+          ...state.courseData[cardKey],
+          ...data,
+        },
+      };
+
+      return {
+        ...state,
+        courseData: newCourseData,
+      };
+    },
   },
 });
 
