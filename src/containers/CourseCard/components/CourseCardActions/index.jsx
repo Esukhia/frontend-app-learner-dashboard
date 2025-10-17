@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
 import { ActionRow } from '@openedx/paragon';
 
@@ -12,6 +13,16 @@ import ResumeButton from './ResumeButton';
 import ViewCourseButton from './ViewCourseButton';
 import ProgressBar from './ProgressBar';
 
+const ProgressLoader = () => (
+  <div className="dots-loader__container" role="status" aria-label="Loading">
+    <div className="dots-loader" aria-hidden="true">
+      <span className="dots-loader__dot" />
+      <span className="dots-loader__dot" />
+      <span className="dots-loader__dot" />
+    </div>
+  </div>
+);
+
 export const CourseCardActions = ({ cardId }) => {
   const { isEntitlement, isFulfilled } = reduxHooks.useCardEntitlementData(cardId);
   const {
@@ -19,10 +30,17 @@ export const CourseCardActions = ({ cardId }) => {
   } = reduxHooks.useCardEnrollmentData(cardId);
   const { isArchived } = reduxHooks.useCardCourseRunData(cardId);
 
+  const completionSummary = useSelector(state => state.app.courseData[cardId]?.completionSummary);
+
   return (
     <ActionRow data-test-id="CourseCardActions">
       <CourseCardActionSlot cardId={cardId} />
-      <ProgressBar cardId={cardId} hasStarted={hasStarted} />
+      {/* Show placeholder/progress if completion data hasn't arrived */}
+      {completionSummary ? (
+        <ProgressBar cardId={cardId} hasStarted={hasStarted} />
+      ) : (
+        <ProgressLoader />
+      )}
       {isEntitlement && (isFulfilled
         ? <ViewCourseButton cardId={cardId} />
         : <SelectSessionButton cardId={cardId} />
