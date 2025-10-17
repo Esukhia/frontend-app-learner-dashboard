@@ -90,12 +90,22 @@ const app = createSlice({
       const cardKey = Object.keys(state.courseData).find(
         key => state.courseData[key].courseKey === courseId,
       );
-      if (cardKey) {
-        state.courseData[cardKey] = {
+      if (!cardKey) {
+        return state;
+      }
+
+      const newCourseData = {
+        ...state.courseData,
+        [cardKey]: {
           ...state.courseData[cardKey],
           ...data,
-        };
-      }
+        },
+      };
+
+      return {
+        ...state,
+        courseData: newCourseData,
+      };
     },
   },
 });
