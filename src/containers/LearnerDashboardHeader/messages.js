@@ -48,7 +48,7 @@ const messages = defineMessages({
   },
   course: {
     id: 'learnerVariantDashboard.course',
-    defaultMessage: 'Courses',
+    defaultMessage: 'Dashboard',
     description: 'Header link for switching to dashboard page.',
   },
   program: {
