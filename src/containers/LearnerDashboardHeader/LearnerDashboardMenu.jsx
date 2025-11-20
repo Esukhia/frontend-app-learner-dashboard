@@ -13,7 +13,7 @@ const getLearnerHeaderMenu = (
   mainMenu: [
     {
       type: 'item',
-      href: '/',
+      href: '/learner-dashboard/',
       content: formatMessage(messages.course),
       isActive: true,
     },
