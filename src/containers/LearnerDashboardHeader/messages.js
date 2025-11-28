@@ -61,6 +61,11 @@ const messages = defineMessages({
     defaultMessage: 'Discover New',
     description: 'Header link for switching to discover page.',
   },
+  wishlist: {
+    id: 'learnerVariantDashboard.wishlist',
+    defaultMessage: 'Wishlist',
+    description: 'Header link for switching to wishlist page.',
+  },
   logoAltText: {
     id: 'learnerVariantDashboard.logoAltText',
     defaultMessage: 'edX, Inc. Dashboard',
