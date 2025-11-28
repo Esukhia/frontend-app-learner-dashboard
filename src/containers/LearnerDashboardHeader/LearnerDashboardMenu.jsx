@@ -31,6 +31,11 @@ const getLearnerHeaderMenu = (
       },
     }]
       : []),
+    {
+      type: 'item',
+      href: `${urls.baseAppUrl('/wishlist')}`,
+      content: formatMessage(messages.wishlist),
+    },
   ],
   secondaryMenu: [
     ...(getConfig().SUPPORT_URL ? [{
