@@ -28,28 +28,52 @@ export const CoursesPanel = () => {
   const { formatMessage } = useIntl();
   const hasCourses = reduxHooks.useHasCourses();
   const courseListData = useCourseListData();
-  const courses = useSelector(state => state.app.currentList?.courseIds || []);
+  const courseData = useSelector(state => state.app.courseData || {});
+
+  // Track which courses have been fetched to avoid duplicate calls
+  const fetchedCoursesRef = React.useRef(new Set());
+
+  // Get course IDs from visible list on current page
+  const visibleCourseIds = React.useMemo(
+    () => courseListData.visibleList
+      .map(({ cardId }) => courseData[cardId]?.courseKey)
+      .filter(Boolean),
+    [courseListData.visibleList, courseData],
+  );
+
+  // Create a stable string key for dependency checking
+  const visibleCourseIdsKey = visibleCourseIds.sort().join(',');
 
   useEffect(() => {
     const { updateCourseCard, setCompletionPending } = actions;
     const load = async () => {
-      if (!courses.length) {
+      // Filter out courses that have already been fetched
+      const coursesToLoad = visibleCourseIds.filter(
+        courseId => !fetchedCoursesRef.current.has(courseId)
+      );
+
+      if (!coursesToLoad.length) {
         return;
       }
+
+      // Mark these courses as being fetched
+      coursesToLoad.forEach(courseId => fetchedCoursesRef.current.add(courseId));
+
       dispatch(setCompletionPending(true));
       try {
-        const { data } = await getCompletionData({ courseIds: courses });
+        const { data } = await getCompletionData({ courseIds: coursesToLoad });
         Object.entries(data).forEach(([courseKey, summary]) => {
           dispatch(updateCourseCard({ courseId: courseKey, data: { completionSummary: summary } }));
         });
       } catch (err) {
-        // logging is handled elsewhere; swallow to avoid breaking UI
+        // If there's an error, remove from fetched set so it can be retried
+        coursesToLoad.forEach(courseId => fetchedCoursesRef.current.delete(courseId));
       } finally {
         dispatch(setCompletionPending(false));
       }
     };
     load();
-  }, [dispatch, courses]);
+  }, [dispatch, visibleCourseIdsKey]);
 
   return (
     <div className="course-list-container">
