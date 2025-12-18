@@ -32,25 +32,52 @@ export const CoursesPanel = () => {
 
   // Track which courses have been fetched to avoid duplicate calls
   const fetchedCoursesRef = React.useRef(new Set());
+  // Track which courses have been initialized with empty completion
+  const initializedCoursesRef = React.useRef(new Set());
 
-  // Get course IDs from visible list on current page
-  const visibleCourseIds = React.useMemo(
+  // Get all visible course info (both started and not started)
+  const visibleCoursesInfo = React.useMemo(
     () => courseListData.visibleList
-      .map(({ cardId }) => courseData[cardId]?.courseKey)
+      .map(({ cardId }) => {
+        const card = courseData[cardId];
+        if (card?.courseKey) {
+          return {
+            courseKey: card.courseKey,
+            hasStarted: card?.enrollment?.hasStarted || false,
+          };
+        }
+        return null;
+      })
       .filter(Boolean),
     [courseListData.visibleList, courseData],
   );
 
-  // Create a stable string key for dependency checking
-  const visibleCourseIdsKey = visibleCourseIds.sort().join(',');
+  // Create a stable string key for dependency checking (all visible courses)
+  const visibleCourseIdsKey = visibleCoursesInfo
+    .map(c => c.courseKey)
+    .sort()
+    .join(',');
 
   useEffect(() => {
     const { updateCourseCard, setCompletionPending } = actions;
     const load = async () => {
-      // Filter out courses that have already been fetched
-      const coursesToLoad = visibleCourseIds.filter(
-        courseId => !fetchedCoursesRef.current.has(courseId)
+      // Set empty completion summary for courses that haven't started (only once)
+      const notStartedCourses = visibleCoursesInfo.filter(
+        ({ courseKey, hasStarted }) => !hasStarted && !initializedCoursesRef.current.has(courseKey),
       );
+
+      notStartedCourses.forEach(({ courseKey }) => {
+        initializedCoursesRef.current.add(courseKey);
+        dispatch(updateCourseCard({
+          courseId: courseKey,
+          data: { completionSummary: { complete_count: 0, incomplete_count: 0, locked_count: 0 } },
+        }));
+      });
+
+      // Filter out courses that have already been fetched (only started courses)
+      const coursesToLoad = visibleCoursesInfo
+        .filter(({ hasStarted, courseKey }) => hasStarted && !fetchedCoursesRef.current.has(courseKey))
+        .map(({ courseKey }) => courseKey);
 
       if (!coursesToLoad.length) {
         return;
@@ -73,6 +100,7 @@ export const CoursesPanel = () => {
       }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, visibleCourseIdsKey]);
 
   return (
