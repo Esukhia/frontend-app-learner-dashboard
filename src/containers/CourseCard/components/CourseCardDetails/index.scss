@@ -1,3 +1,10 @@
 a.course-card-title {
   color: var(--pgn-color-black);
+  font-family: "Jomolhari", var(--pgn-font-family-sans-serif, sans-serif);
+  line-height: 1.5;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  letter-spacing: 0.3px;
+  font-size: 25px;
+  font-weight: 600;
 }
