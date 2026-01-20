@@ -14,13 +14,12 @@ export const CourseCardDetails = ({ cardId }) => {
     isFulfilled,
     canChange,
     openSessionModal,
-    courseNumber,
     changeOrLeaveSessionMessage,
   } = useCardDetailsData({ cardId });
 
   return (
     <span className="small" data-testid="CourseCardDetails">
-      {providerName} • {courseNumber}
+      {providerName}
       {!(isEntitlement && !isFulfilled) && accessMessage && (
         ` • ${accessMessage}`
       )}

@@ -30,3 +30,4 @@ src/i18n/messages
 
 /frontend-component-header
 /frontend-component-footer
+webpack.dev-tutor.config.js
