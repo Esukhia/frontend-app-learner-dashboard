@@ -13,7 +13,13 @@ export const state = StrictDict({
 
 export const useInitializeDashboard = () => {
   const initialize = apiHooks.useInitializeApp();
-  React.useEffect(() => { initialize(); }, []); // eslint-disable-line
+  const hasInitialized = React.useRef(false);
+  React.useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      initialize();
+    }
+  }, []); // eslint-disable-line
 };
 
 export const useDashboardMessages = () => {
