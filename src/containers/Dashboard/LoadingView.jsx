@@ -7,7 +7,10 @@ export const LoadingView = () => {
   const { spinnerScreenReaderText } = hooks.useDashboardMessages();
 
   return (
-    <div className="course-list-loading">
+    <div
+      className="course-list-loading"
+      style={{ height: '100vh' }}
+    >
       <Spinner
         animation="border"
         className="mie-3"
